@@ -41,6 +41,8 @@ the following:
 DOC_PATH=./docs/main.apib DOC_STORAGE=s3 doc_orchestra sync
 ```
 
+See [Getting Started](/docs/getting_started.md) for details.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/zipmark/doc_orchestra.

@@ -1,41 +1,42 @@
 module DocOrchestra
   class Configuration
-    class UnknownStrategy < StandardError; end
-
-    KNOWN_DOC_FORMATS  = ["apib"]
-    KNOWN_DOC_STORAGES = ["s3"]
+    class UnexpectedConfiguration < StandardError; end
+    class MissingConfiguration < StandardError; end
 
     def initialize(env)
       @env = env
+      @dictionary = {}
     end
 
-    def strategy
-      {
-        doc_format:  env_value(name: :doc_format,  whitelist: KNOWN_DOC_FORMATS),
-        doc_storage: env_value(name: :doc_storage, whitelist: KNOWN_DOC_STORAGES),
-        doc_path:    env_value(name: :doc_path),
-      }
+    def [](key)
+      if @env[key] != ""
+        @env[key]
+      end
     end
 
-    private
-
-    def env_value(name:, whitelist: nil)
-      env_var_name = name.to_s.upcase
-      whitelisted_value(env_var_name, whitelist) || @env[env_var_name]
-    end
-
-    def whitelisted_value(env_var_name, whitelist = nil)
-      if whitelist
-        if whitelist.include?(@env[env_var_name])
-          @env[env_var_name].to_sym
-        else
-          raise UnknownStrategy, "ENV var '#{env_var_name}' has unknown value, '#{@env[env_var_name]}'. See #{help_url} for details."
+    def required_keys(*keys)
+      keys.each do |key|
+        if blank_value?(@env[key])
+          raise MissingConfiguration, "The following environment variables are missing: #{key}"
         end
       end
     end
 
+    def required_values(key, *values)
+      required_keys(key)
+      unless values.include?(self[key])
+        raise UnexpectedConfiguration, "Environment variable #{key} accepted values are: #{values.join(", ")} (#{self[key]} provided). #{help_url}"
+      end
+    end
+
+    private
+
+    def blank_value?(str)
+      str.nil? || str == ""
+    end
+
     def help_url
-      "https://github.com/zipmark/doc_orchestra"
+      "See https://github.com/zipmark/doc_orchestra for details."
     end
   end
 end

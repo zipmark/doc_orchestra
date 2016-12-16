@@ -1,80 +1,76 @@
-require "doc_orchestra/configuration"
+require "spec_helper"
 
 describe DocOrchestra::Configuration do
-  let(:doc_format) { "apib" }
-  let(:doc_storage) { "s3" }
-
   let(:env) do
     {
-      "DOC_FORMAT" => doc_format,
-      "DOC_STORAGE" => doc_storage
+      "DOC_STORAGE"  => "s3",
+      "CUSTOM_KEY"   => "custom value",
+      "BLANK_STRING" => "",
     }
   end
 
   subject(:config) { described_class.new(env) }
 
-  describe "#strategy" do
-    context 'doc_format' do
-      subject { config.strategy[:doc_format] }
-
-      context 'apib' do
-        let(:doc_format) { "apib" }
-
-        it "saves format strategy" do
-          expect(subject).to eq :apib
-        end
-      end
-
-      context 'unknown format' do
-        let(:doc_format) { "something_else" }
-
-        it "raises" do
-          expect { subject }.to raise_error DocOrchestra::Configuration::UnknownStrategy
-        end
+  describe "#required_keys" do
+    context 'when no key is missing' do
+      it 'does not raise errors' do
+        expect {
+          config.required_keys("CUSTOM_KEY", "DOC_STORAGE")
+        }.to_not raise_error
       end
     end
 
-    context 'doc_storage' do
-      subject { config.strategy[:doc_storage] }
-
-      context 's3' do
-        let(:doc_storage) { "s3" }
-
-        it "saves storage strategy" do
-          expect(subject).to eq :s3
-        end
+    context 'when one key is not defined' do
+      it 'raises an error' do
+        expect {
+          config.required_keys("MISSING_KEY", "DOC_STORAGE")
+        }.to raise_error described_class::MissingConfiguration
       end
+    end
+  end
 
-      context 'unknown storage' do
-        let(:doc_storage) { "something_else" }
-
-        it "raises" do
-          expect { subject }.to raise_error DocOrchestra::Configuration::UnknownStrategy
-        end
+  describe '#[]' do
+    context 'value exists' do
+      it 'returns an env var value' do
+        expect(config["CUSTOM_KEY"]).to eq "custom value"
       end
     end
 
-    context 'doc_path' do
-      subject { config.strategy[:doc_path] }
-
-      before do
-        env.merge!("DOC_PATH" => doc_path)
+    context 'value is a blank string' do
+      it 'returns nil' do
+        expect(config["BLANK_STRING"]).to eq nil
       end
+    end
 
-      context 'a file path is specified' do
-        let(:doc_path) { "./some_path" }
-
-        it "saves the doc path" do
-          expect(subject).to eq "./some_path"
-        end
+    context 'value does not exist' do
+      it 'returns nil' do
+        expect(config["NO_KEY"]).to eq nil
       end
+    end
+  end
 
-      context 'when no doc path specified' do
-        let(:doc_path) { nil }
+  describe '#required_values' do
+    context 'a value is incorrect' do
+      it 'raises' do
+        expect {
+          config.required_values("DOC_STORAGE", "s4", "s5")
+        }.to raise_error described_class::UnexpectedConfiguration
+      end
+    end
 
-        it "returns nil" do
-          expect(subject).to eq nil
-        end
+    context 'the key does not exist' do
+      it 'raises' do
+        expect {
+          config.required_values("NO_KEY", "s3")
+        }.to raise_error described_class::MissingConfiguration
+      end
+    end
+
+    context 'a value is incorrect' do
+      it 'raises' do
+        expect {
+          config.required_values("DOC_STORAGE", "s3")
+        }.to_not raise_error
       end
     end
   end
