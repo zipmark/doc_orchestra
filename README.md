@@ -2,8 +2,22 @@
 
 **Important:** this gem is not production ready.
 
-This is the code that orchestrates Zipmark's automatically generated
-documentation and its publication.
+## The problem
+
+You have systems that change and their documentation gets
+outdated because they are maintaned manually.
+
+**The solution**
+
+DocOrchestra attempts to help mitigate that problem with several
+functionalities. This is the roadmap
+
+* automate document generation (e.g [rspec_api_documentation](https://github.com/zipmark/rspec_api_documentation) )
+* automate linting of the document files (e.g [linter-api-blueprint](https://github.com/zdne/linter-api-blueprint)
+* automate testing the documentation against real APIs (e.g [dredd](https://github.com/apiaryio/dredd))
+* automate concatenating multiple documentation files into one (e.g microservirces)
+* automate generating [API Elements](http://api-elements.readthedocs.io/en/latest/)
+* automate publishing the documentation to the cloud (e.g S3)
 
 ## Installation
 
@@ -19,9 +33,14 @@ And then execute:
 
 ## Usage
 
-Pending
+Running this tool requires specifying a few options via ENV variables, like
+the following:
 
-## Development
+```
+DOC_PATH=./docs/main.apib DOC_STORAGE=s3 doc_orchestra sync
+```
+
+See [Getting Started](/docs/getting_started.md) for details.
 
 ## Contributing
 
