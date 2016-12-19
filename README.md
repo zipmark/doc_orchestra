@@ -10,7 +10,7 @@ outdated because they are maintaned manually.
 **The solution**
 
 DocOrchestra attempts to help mitigate that problem with several
-functionalities:
+functionalities. This is the roadmap
 
 * automate document generation (e.g [rspec_api_documentation](https://github.com/zipmark/rspec_api_documentation) )
 * automate linting of the document files (e.g [linter-api-blueprint](https://github.com/zdne/linter-api-blueprint)
@@ -18,7 +18,6 @@ functionalities:
 * automate concatenating multiple documentation files into one (e.g microservirces)
 * automate generating [API Elements](http://api-elements.readthedocs.io/en/latest/)
 * automate publishing the documentation to the cloud (e.g S3)
-
 
 ## Installation
 

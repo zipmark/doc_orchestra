@@ -1,5 +1,7 @@
 # Getting Started
 
+[WIP]
+
 Each one of these steps will depend on the orchestration strategies chosen.
 These are the strategies that can be defined:
 
